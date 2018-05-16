@@ -1,0 +1,7 @@
+[package]
+name = "reddit_refresh_rust"
+version = "0.1.0"
+authors = ["Nicholas Jones <dojoman19@gmail.com>"]
+
+[dependencies]
+config = "0.8"
