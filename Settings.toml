@@ -1,6 +1,12 @@
-debug = false
-priority = 32
-key = "189rjfadoisfj8923fjio"
+[user_info]
+api_key = "your_api_key"
+
+[program_config]
+interval = 1
+
+[devices]
+huawei_nexus_6p = "uf34031sdas"
 
 [subreddits]
 mechmarket = ["Planck", "Dog", "Man"]
+gamedeals = ["Batman", "Battlefield"]
