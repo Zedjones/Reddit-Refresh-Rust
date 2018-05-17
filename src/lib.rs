@@ -15,7 +15,7 @@ pub mod reserializer{
             for (entry, value) in table.clone().into_table().unwrap(){
                 match value.clone().into_str(){
                     Ok(val) => {
-                        let entry_str = format!("{} = {}\n", entry, val);
+                        let entry_str = format!("{} = \"{}\"\n", entry, val);
                         output.push_str(&entry_str);
                     }
                     Err(_) => {

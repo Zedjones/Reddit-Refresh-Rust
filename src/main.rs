@@ -1,13 +1,15 @@
 extern crate config;
 extern crate reddit_refresh_rust;
 
-use config::{Config, File};
+use config::{Config};
 use reddit_refresh_rust::reserializer::{reserialize};
+use std::fs::File;
+use std::io::prelude::Write;
 
 fn main() {
     let mut settings = Config::new();
     
-    settings.merge(File::with_name("Settings")).unwrap();
+    settings.merge(config::File::with_name("Settings")).unwrap();
 
     settings.set("user_info.keys", "10543sd").unwrap();
 
@@ -15,6 +17,13 @@ fn main() {
 
     settings.set("subreddits.keyboard", test).unwrap();
 
+    settings.set("users.zedjones", "me").unwrap();
+
     let output = reserialize(settings);
+
+    let mut file = File::create("Test.toml").unwrap();
+
+    file.write_all(output.as_bytes()).unwrap();
+
     println!("{}", output);
 }
