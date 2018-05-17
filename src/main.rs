@@ -1,12 +1,16 @@
 extern crate config;
+extern crate reddit_refresh_rust;
 
 use std::collections::HashMap;
 use config::{Config, File};
+use reddit_refresh_rust::reserializer::{reserialize};
 
 fn main() {
     let mut settings = Config::new();
     
     settings.merge(File::with_name("Settings")).unwrap();
+
+    /*
 
     let subreddits : HashMap<String, config::Value> = 
         settings.get_table("subreddits").unwrap();
@@ -19,7 +23,14 @@ fn main() {
             }
         }
     }
+    */
 
+    settings.set("user_info.keys", "10543sd").unwrap();
+
+    let test = vec!["dog", "man"];
+
+    settings.set("subreddits.keyboard", test).unwrap();
+    /*
     let user_info: HashMap<String, config::Value> = 
         settings.get_table("user_info").unwrap();
 
@@ -33,4 +44,14 @@ fn main() {
     for (key, value) in program_config{
         println!("{}: {}", key, value.into_str().unwrap());
     }
+
+    let devices: HashMap<String, config::Value> = 
+        settings.get_table("devices").unwrap();
+
+    for (key, value) in devices{
+        println!("{}: {}", key, value.into_str().unwrap());
+    }
+    */
+
+    reserialize(settings);
 }

@@ -6,6 +6,7 @@ interval = 1
 
 [devices]
 huawei_nexus_6p = "uf34031sdas"
+"Huawei Nexus 6P" = "do"
 
 [subreddits]
 mechmarket = ["Planck", "Dog", "Man"]
