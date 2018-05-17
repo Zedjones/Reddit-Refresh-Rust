@@ -53,5 +53,6 @@ fn main() {
     }
     */
 
-    reserialize(settings);
+    let output = reserialize(settings);
+    println!("{}", output);
 }
