@@ -1,4 +1,7 @@
 extern crate config;
+extern crate reqwest;
+extern crate indexmap;
+extern crate serde_json;
 
 pub mod reserializer{
     
@@ -31,5 +34,58 @@ pub mod reserializer{
             output.push_str("\n");
         }
         output
+    }
+}
+
+pub mod subparser{
+
+    use indexmap::IndexMap;
+    use reqwest::get;
+    use serde_json::{Value, from_str};
+    
+    pub fn get_results(mut sub: String, mut search:String) 
+    -> Result<IndexMap<String, String>, String>{
+
+        let mut url_map = IndexMap::new();
+
+        if !sub.contains("r/"){
+            sub = format!("r/{}", sub);
+        }
+        if search.contains(" "){
+            search = search.replace(" ", "+");
+        }
+
+        let url = format!("https://www.reddit.com/{}/\
+            search.json?q={}&restrict_sr=on&limit=1", sub, search);
+
+        let content = get(&url).unwrap().text().unwrap();
+        let json: Value = from_str(&content).unwrap();
+        let results = json["data"]["children"].as_array().expect("Could not into array");
+
+        if results.len() == 0{
+            return Err("Invalid subreddit provided".to_string());
+        }
+
+        for result in results{
+            let link = result["data"]["url"].as_str().unwrap();
+            let title = result["data"]["title"].as_str().unwrap();
+            url_map.insert(link.to_string(), title.to_string());
+        }
+
+        println!("{:#?}", url_map);
+        Ok(url_map)
+    }
+
+}
+
+#[cfg(test)]
+mod tests{
+
+    use super::subparser::get_results;
+
+    #[test]
+    fn subparser_results(){
+        get_results("mechanicalkeyboards".to_string(), "Planck".to_string()).unwrap();
+        println!("dog");
     }
 }

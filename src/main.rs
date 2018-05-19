@@ -3,6 +3,7 @@ extern crate reddit_refresh_rust;
 
 use config::{Config};
 use reddit_refresh_rust::reserializer::{reserialize};
+use reddit_refresh_rust::subparser::get_results;
 use std::fs::File;
 use std::io::prelude::Write;
 
@@ -25,5 +26,7 @@ fn main() {
 
     file.write_all(output.as_bytes()).unwrap();
 
-    println!("{}", output);
+    get_results("mechanicalkeyboards".to_string(), "Planck".to_string()).unwrap();
+
+    //println!("{}", output);
 }
