@@ -56,7 +56,7 @@ pub mod subparser{
         }
 
         let url = format!("https://www.reddit.com/{}/\
-            search.json?q={}&restrict_sr=on&limit=1", sub, search);
+            search.json?q={}&sort=new&restrict_sr=on&limit=1", sub, search);
 
         let content = get(&url).unwrap().text().unwrap();
         let json: Value = from_str(&content).unwrap();
