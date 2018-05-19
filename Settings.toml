@@ -2,7 +2,7 @@
 api_key = "your_api_key"
 
 [program_config]
-interval = 1
+interval = 2
 
 [devices]
 huawei_nexus_6p = "uf34031sdas"

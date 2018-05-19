@@ -58,8 +58,17 @@ pub mod subparser{
         let url = format!("https://www.reddit.com/{}/\
             search.json?q={}&sort=new&restrict_sr=on&limit=1", sub, search);
 
-        let content = get(&url).unwrap().text().unwrap();
-        let json: Value = from_str(&content).unwrap();
+        let content = match get(&url).unwrap().text(){
+            Ok(content) => content, 
+            Err(_) => return Err("Error retrieving webpage".to_string())
+        };
+
+        let json: Value = match from_str(&content){
+            Ok(json) => json,
+            Err(_) => return Err("Error decoding json object, \
+            likely due to an invalid subreddit entered".to_string())
+        };
+
         let results = json["data"]["children"].as_array().expect("Could not into array");
 
         if results.len() == 0{
