@@ -42,23 +42,24 @@ fn get_user_settings(config: &mut Config){
     match config.get::<String>(CONF_TOKEN){
         Ok(_) => (),
         Err(_) => {
-            print!("Please enter your Pushbullet API token: ");
-            stdout().flush().unwrap();
-            let mut token = String::new();
-            stdin().read_line(&mut token).unwrap();
-            config.set(CONF_TOKEN, token.trim()).unwrap();
+            get_user_setting(config, "Please enter your Pushbullet \
+            API token: ", CONF_TOKEN);
         }
     };
 
     match config.get::<String>(CONF_INTERVAL){
         Ok(_) => (),
         Err(_) => {
-            print!("Interval to check for new results (in minutes): ");
-            stdout().flush().unwrap();
-            let mut interval = String::new();
-            stdin().read_line(&mut interval).unwrap();
-            config.set(CONF_INTERVAL, interval.trim()).unwrap();
+            get_user_setting(config, "Interval to check for new results \
+            (in minutes): ", CONF_INTERVAL);
         }
     };
+}
 
+fn get_user_setting(config: &mut Config, msg: &str, setting: &str){
+    print!("{}", msg);
+    stdout().flush().unwrap();
+    let mut item = String::new();
+    stdin().read_line(&mut item).unwrap();
+    config.set(setting, item.trim()).unwrap();
 }
