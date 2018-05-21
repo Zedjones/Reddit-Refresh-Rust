@@ -142,7 +142,7 @@ pub mod pushbullet{
             let id = device["iden"].as_str().expect("Could not iden");
             let nick = match device["nickname"].as_str(){
                 Some(nickname) => nickname,
-                None => continue
+                None => continueF
             };
             devices_map.insert(id.to_string(), nick.to_string());
         }
@@ -155,12 +155,13 @@ pub mod pushbullet{
                 let client = Client::new();
                 let mut data = HashMap::new();
                 let mut headers = Headers::new();
-                data.insert("title", title);
-                data.insert("url", url);
-                data.insert("device_iden", &device);
+                data.insert("title", title.to_string());
+                data.insert("url", url.to_string());
+                data.insert("type", "link".to_string());
+                data.insert("device_iden", device.to_string());
                 headers.set(ContentType::json());
                 headers.set_raw("Access-Token", token);
-                client.post(PUSHES_URL).headers(headers).json(&data);
+                client.post(PUSHES_URL).headers(headers).json(&data).send().unwrap();
             }
         }
     }

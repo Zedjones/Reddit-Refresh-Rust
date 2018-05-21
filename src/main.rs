@@ -4,7 +4,7 @@ extern crate reddit_refresh_rust;
 use config::{Config};
 use reddit_refresh_rust::reserializer::{reserialize};
 use reddit_refresh_rust::subparser::get_results;
-use reddit_refresh_rust::pushbullet::get_devices;
+use reddit_refresh_rust::pushbullet::{get_devices, send_push_link};
 use std::fs::File;
 use std::path::Path;
 use std::io::prelude::Write;
@@ -27,8 +27,6 @@ fn main() {
 
     settings.set("subreddits.keyboard", test).unwrap();
 
-    println!("{:#?}", get_devices("o.qad2VOhc2iY8U6zB7ZeUJLo5tcgkqHu0".to_string()));
-
     settings.set("users.zedjones", "me").unwrap();
 
     get_user_settings(&mut settings);
@@ -39,7 +37,7 @@ fn main() {
 
     file.write_all(output.as_bytes()).unwrap();
 
-    get_results("mechanicalkeyboards".to_string(), "Planck".to_string()).unwrap();
+    let results = get_results("mechanicalkeyboards".to_string(), "Planck".to_string()).unwrap();
 
 }
 
