@@ -119,7 +119,7 @@ pub mod subparser{
 pub mod pushbullet{
 
     use std::collections::HashMap;
-    use reqwest::get;
+    use reqwest::{get, Client};
     use serde_json::{Value, from_str};
 
     const DEVICES_URL: &str = "https://api.pushbullet.com/v2/devices";
@@ -127,14 +127,19 @@ pub mod pushbullet{
 
     pub fn get_devices(token: String) -> HashMap<String, String>{
         let mut devices_map = HashMap::new();
-        let url = format!("{}?auth={}", DEVICES_URL, token); 
-        let content = get(&url).unwrap().text().unwrap();
-        println!("{:#?}", content);
+        let client = Client::new();
+        let mut content = client.get(DEVICES_URL)
+            .basic_auth::<String, String>(token, None).send().unwrap();
+        let content = content.text().unwrap();
+        println!("{}", content);
         let json: Value = from_str(&content).unwrap();
         let devices = json["devices"].as_array().expect("Could not into array");
         for device in devices{
-            let id = device["iden"].as_str().unwrap();
-            let nick = device["nickname"].as_str().unwrap();
+            let id = device["iden"].as_str().expect("Could not iden");
+            let nick = match device["nickname"].as_str(){
+                Some(nickname) => nickname,
+                None => continue
+            };
             devices_map.insert(id.to_string(), nick.to_string());
         }
         devices_map
