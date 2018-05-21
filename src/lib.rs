@@ -59,6 +59,8 @@ pub mod subparser{
     use indexmap::IndexMap;
     use reqwest::get;
     use serde_json::{Value, from_str};
+
+    pub type ResultMap = IndexMap<String, String>;
     
     /**
      * Get the first result for a search on a subreddit, sortng by new
@@ -67,7 +69,7 @@ pub mod subparser{
      * @return url_map - a map of the comments link to the post title 
     */
     pub fn get_results(mut sub: String, mut search:String) 
-    -> Result<IndexMap<String, String>, String>{
+    -> Result<ResultMap, String>{
 
         let mut url_map = IndexMap::new();
 
@@ -119,8 +121,10 @@ pub mod subparser{
 pub mod pushbullet{
 
     use std::collections::HashMap;
-    use reqwest::{get, Client};
+    use reqwest::Client;
+    use reqwest::header::{Headers, ContentType};
     use serde_json::{Value, from_str};
+    use super::subparser::ResultMap;
 
     const DEVICES_URL: &str = "https://api.pushbullet.com/v2/devices";
     const PUSHES_URL: &str = "https://api.pushbullet.com/v2/pushes";
@@ -143,5 +147,21 @@ pub mod pushbullet{
             devices_map.insert(id.to_string(), nick.to_string());
         }
         devices_map
+    }
+
+    pub fn send_push_link(devices: Vec<String>, token: &str, items: ResultMap){
+        for device in devices{
+            for (url, title) in items.iter(){
+                let client = Client::new();
+                let mut data = HashMap::new();
+                let mut headers = Headers::new();
+                data.insert("title", title);
+                data.insert("url", url);
+                data.insert("device_iden", &device);
+                headers.set(ContentType::json());
+                headers.set_raw("Access-Token", token);
+                client.post(PUSHES_URL).headers(headers).json(&data);
+            }
+        }
     }
 }
