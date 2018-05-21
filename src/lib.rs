@@ -142,7 +142,7 @@ pub mod pushbullet{
             let id = device["iden"].as_str().expect("Could not iden");
             let nick = match device["nickname"].as_str(){
                 Some(nickname) => nickname,
-                None => continueF
+                None => continue
             };
             devices_map.insert(id.to_string(), nick.to_string());
         }
