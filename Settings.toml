@@ -5,7 +5,3 @@ api_key = "your_api_key"
 
 [devices]
 huawei_nexus_6p = "uf34031sdas"
-
-[subreddits]
-mechmarket = ["Planck", "Dog", "Man"]
-gamedeals = ["Batman", "Battlefield"]

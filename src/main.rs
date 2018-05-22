@@ -10,9 +10,11 @@ use std::path::Path;
 use std::io::prelude::Write;
 use std::io::stdin;
 use std::io::stdout;
+use std::collections::HashMap;
 
 const CONF_TOKEN: &str = "user_info.token";
 const CONF_INTERVAL: &str = "program_config.interval";
+const SUBS: &str = "subreddits";
 
 fn main() {
     let mut settings = Config::new();
@@ -24,8 +26,6 @@ fn main() {
     settings.set("user_info.keys", "10543sd").unwrap();
 
     let test = vec!["dog", "man"];
-
-    settings.set("subreddits.keyboard", test).unwrap();
 
     settings.set("users.zedjones", "me").unwrap();
 
@@ -57,6 +57,15 @@ fn get_user_settings(config: &mut Config){
             (in minutes): ", CONF_INTERVAL);
         }
     };
+
+    match config.get_table(SUBS){
+        Ok(map) => {
+            if map.is_empty() {
+                get_subreddits(config);
+            }
+        }, 
+        Err(_) => get_subreddits(config)
+    };
 }
 
 fn get_user_setting(config: &mut Config, msg: &str, setting: &str){
@@ -65,4 +74,29 @@ fn get_user_setting(config: &mut Config, msg: &str, setting: &str){
     let mut item = String::new();
     stdin().read_line(&mut item).unwrap();
     config.set(setting, item.trim()).unwrap();
+}
+
+fn get_subreddits(config: &mut Config){
+    println!("Hit enter to stop inputting subreddits");
+    loop{
+        print!("Enter a subreddit to search: ");
+        stdout().flush().unwrap();
+        let mut subreddit = String::new();
+        stdin().read_line(&mut subreddit).unwrap();
+        subreddit = subreddit.trim().to_string();
+        if subreddit == "" { break; }
+        println!("Hit enter to stop inputting searches for {}", subreddit);
+        let mut searches = Vec::new();
+        loop{
+            print!("Enter a search term: ");
+            stdout().flush().unwrap();
+            let mut search = String::new();
+            stdin().read_line(&mut search).unwrap();
+            search = search.trim().to_string();
+            if search == "" { break; }
+            searches.push(search);
+        }
+        let key = format!("subreddits.{}", subreddit);
+        config.set(&key, searches).unwrap();
+    }
 }
