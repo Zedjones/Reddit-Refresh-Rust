@@ -23,21 +23,19 @@ fn main() {
         settings.merge(config::File::with_name("Settings")).unwrap();
     }
 
-    settings.set("user_info.keys", "10543sd").unwrap();
-
-    let test = vec!["dog", "man"];
-
-    settings.set("users.zedjones", "me").unwrap();
-
     get_user_settings(&mut settings);
+
+    for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
+        for search in searches.into_array().unwrap(){
+            println!("{}:{}", subreddit, search);
+        }
+    }
 
     let output = reserialize(settings);
 
     let mut file = File::create("Test.toml").unwrap();
 
     file.write_all(output.as_bytes()).unwrap();
-
-    let results = get_results("mechanicalkeyboards".to_string(), "Planck".to_string()).unwrap();
 
 }
 
@@ -86,7 +84,7 @@ fn get_subreddits(config: &mut Config){
         subreddit = subreddit.trim().to_string();
         if subreddit == "" { break; }
         println!("Hit enter to stop inputting searches for {}", subreddit);
-        let mut searches = Vec::new();
+        let mut searches: Vec<String> = Vec::new();
         loop{
             print!("Enter a search term: ");
             stdout().flush().unwrap();
@@ -97,6 +95,9 @@ fn get_subreddits(config: &mut Config){
             searches.push(search);
         }
         let key = format!("subreddits.{}", subreddit);
-        config.set(&key, searches).unwrap();
+        match config.set(&key, searches){
+            Ok(_) => (),
+            Err(_) => println!("Invalid subreddit entered")
+        };
     }
 }
