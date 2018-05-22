@@ -3,7 +3,6 @@ extern crate reddit_refresh_rust;
 extern crate indexmap;
 
 use config::{Config};
-use indexmap::IndexMap;
 use reddit_refresh_rust::reserializer::{reserialize};
 use reddit_refresh_rust::subparser::{get_results, SubResult};
 use reddit_refresh_rust::pushbullet::{get_devices, send_push_link};
@@ -88,6 +87,23 @@ fn get_user_setting(config: &mut Config, msg: &str, setting: &str){
     let mut item = String::new();
     stdin().read_line(&mut item).unwrap();
     config.set(setting, item.trim()).unwrap();
+}
+
+fn conf_devices(config: &mut Config){
+    let token = config.get::<String>(CONF_TOKEN).unwrap();
+    let devices = get_devices(token);
+    let mut devices_vec = Vec::new();
+    for device in devices{
+        devices_vec.push(device);
+    }
+    println!("Devices available to be pushed to: ");
+    for (ind, (nick, id)) in devices_vec.into_iter().enumerate(){
+        println!("{}: {}", ind, nick);
+    }
+    print!("Enter devices to be pushed to (e.g. 1, 2)");
+    stdout().flush().unwrap();
+    let mut device_inds = String::new();
+    stdin().read_line(&mut device_inds).unwrap();
 }
 
 fn get_subreddits(config: &mut Config){

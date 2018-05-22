@@ -142,7 +142,7 @@ pub mod pushbullet{
                 Some(nickname) => nickname,
                 None => continue
             };
-            devices_map.insert(id.to_string(), nick.to_string());
+            devices_map.insert(nick.to_string(), id.to_string());
         }
         devices_map
     }
