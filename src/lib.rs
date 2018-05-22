@@ -61,6 +61,8 @@ pub mod subparser{
     use serde_json::{Value, from_str};
 
     pub type ResultMap = IndexMap<String, String>;
+
+    pub type SubResult = (String, String);
     
     /**
      * Get the first result for a search on a subreddit, sortng by new
@@ -69,9 +71,7 @@ pub mod subparser{
      * @return url_map - a map of the comments link to the post title 
     */
     pub fn get_results(mut sub: String, mut search:String) 
-    -> Result<ResultMap, String>{
-
-        let mut url_map = IndexMap::new();
+    -> Result<SubResult, String>{
 
         //in case subreddit is missing r/
         if !sub.contains("r/"){
@@ -105,16 +105,13 @@ pub mod subparser{
             return Err("Invalid subreddit provided".to_string());
         }
 
-        for result in results{
-            //no direct way to get comments url, so we improvise
-            let perma = result["data"]["permalink"].as_str().unwrap();
-            let link = format!("https://www.reddit.com{}", perma);
-            let title = result["data"]["title"].as_str().unwrap();
-            url_map.insert(link.to_string(), title.to_string());
-        }
+        let result = results.get(0).unwrap();
+        let perma = result["data"]["permalink"].as_str().unwrap();
+        let link = format!("https://www.reddit.com{}", perma);
+        let title = result["data"]["title"].as_str().unwrap();
 
-        println!("{:#?}", url_map);
-        Ok(url_map)
+        println!("{:#?}", (&link, &title));
+        Ok((link, title.to_string()))
     }
 }
 
@@ -125,6 +122,7 @@ pub mod pushbullet{
     use reqwest::header::{Headers, ContentType};
     use serde_json::{Value, from_str};
     use super::subparser::ResultMap;
+    use super::subparser::SubResult;
 
     const DEVICES_URL: &str = "https://api.pushbullet.com/v2/devices";
     const PUSHES_URL: &str = "https://api.pushbullet.com/v2/pushes";
@@ -149,20 +147,19 @@ pub mod pushbullet{
         devices_map
     }
 
-    pub fn send_push_link(devices: Vec<String>, token: &str, items: ResultMap){
+    pub fn send_push_link(devices: Vec<String>, token: &str, 
+    (url, title): SubResult){
         for device in devices{
-            for (url, title) in items.iter(){
-                let client = Client::new();
-                let mut data = HashMap::new();
-                let mut headers = Headers::new();
-                data.insert("title", title.to_string());
-                data.insert("url", url.to_string());
-                data.insert("type", "link".to_string());
-                data.insert("device_iden", device.to_string());
-                headers.set(ContentType::json());
-                headers.set_raw("Access-Token", token);
-                client.post(PUSHES_URL).headers(headers).json(&data).send().unwrap();
-            }
+            let client = Client::new();
+            let mut data = HashMap::new();
+            let mut headers = Headers::new();
+            data.insert("title", title.to_string());
+            data.insert("url", url.to_string());
+            data.insert("type", "link".to_string());
+            data.insert("device_iden", device.to_string());
+            headers.set(ContentType::json());
+            headers.set_raw("Access-Token", token);
+            client.post(PUSHES_URL).headers(headers).json(&data).send().unwrap();
         }
     }
 }

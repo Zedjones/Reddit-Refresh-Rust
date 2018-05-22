@@ -1,9 +1,11 @@
 extern crate config;
 extern crate reddit_refresh_rust;
+extern crate indexmap;
 
 use config::{Config};
+use indexmap::IndexMap;
 use reddit_refresh_rust::reserializer::{reserialize};
-use reddit_refresh_rust::subparser::get_results;
+use reddit_refresh_rust::subparser::{get_results, SubResult};
 use reddit_refresh_rust::pushbullet::{get_devices, send_push_link};
 use std::fs::File;
 use std::path::Path;
@@ -14,6 +16,7 @@ use std::io::stdout;
 const CONF_TOKEN: &str = "user_info.token";
 const CONF_INTERVAL: &str = "program_config.interval";
 const SUBS: &str = "subreddits";
+const LAST_RESULT: &str = "last_result";
 
 fn main() {
     let mut settings = Config::new();
@@ -27,7 +30,9 @@ fn main() {
     for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
         for search in searches.into_array().unwrap(){
             let result = get_results(subreddit.clone(), 
-                search.into_str().unwrap());
+                search.into_str().unwrap()).unwrap();
+            let last_path = format!("{}.{}", LAST_RESULT, subreddit);
+            handle_result(&settings, result, last_path);
         }
     }
 
@@ -37,6 +42,17 @@ fn main() {
 
     file.write_all(output.as_bytes()).unwrap();
 
+}
+
+fn handle_result(config: &Config, (link, title): SubResult, last_path:String){
+    match config.get::<String>(&last_path){
+        Ok(last_res) => {
+            if last_res != last_path{
+                
+            }
+        }
+        Err(_) => ()
+    };
 }
 
 fn get_user_settings(config: &mut Config){
