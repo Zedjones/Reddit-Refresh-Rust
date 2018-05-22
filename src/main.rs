@@ -10,7 +10,6 @@ use std::path::Path;
 use std::io::prelude::Write;
 use std::io::stdin;
 use std::io::stdout;
-use std::collections::HashMap;
 
 const CONF_TOKEN: &str = "user_info.token";
 const CONF_INTERVAL: &str = "program_config.interval";
@@ -27,7 +26,8 @@ fn main() {
 
     for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
         for search in searches.into_array().unwrap(){
-            println!("{}:{}", subreddit, search);
+            let result = get_results(subreddit.clone(), 
+                search.into_str().unwrap());
         }
     }
 
