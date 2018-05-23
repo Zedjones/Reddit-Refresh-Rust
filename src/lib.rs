@@ -121,7 +121,6 @@ pub mod pushbullet{
     use reqwest::Client;
     use reqwest::header::{Headers, ContentType};
     use serde_json::{Value, from_str};
-    use super::subparser::ResultMap;
     use super::subparser::SubResult;
 
     const DEVICES_URL: &str = "https://api.pushbullet.com/v2/devices";
@@ -133,7 +132,6 @@ pub mod pushbullet{
         let mut content = client.get(DEVICES_URL)
             .basic_auth::<String, String>(token, None).send().unwrap();
         let content = content.text().unwrap();
-        println!("{}", content);
         let json: Value = from_str(&content).unwrap();
         let devices = json["devices"].as_array().expect("Could not into array");
         for device in devices{

@@ -1,7 +1,16 @@
-[user_info]
-api_key = "your_api_key"
+[subreddits]
+mechanicalkeyboards = ["Planck"]
 
 [program_config]
+interval = "2"
 
 [devices]
-huawei_nexus_6p = "uf34031sdas"
+huawei_nexus_6p = "ujAoL3MXhg4sjz3yaXuUnY"
+
+[last_result]
+mechanicalkeyboards = "https://www.reddit.com/r/MechanicalKeyboards/comments/8lbu39/help_planck_shift_getting_stuck/"
+
+[user_info]
+token = "o.qad2VOhc2iY8U6zB7ZeUJLo5tcgkqHu0"
+api_key = "your_api_key"
+

@@ -16,6 +16,7 @@ const CONF_TOKEN: &str = "user_info.token";
 const CONF_INTERVAL: &str = "program_config.interval";
 const SUBS: &str = "subreddits";
 const LAST_RESULT: &str = "last_result";
+const DEVICES: &str = "devices";
 
 fn main() {
     let mut settings = Config::new();
@@ -31,26 +32,35 @@ fn main() {
             let result = get_results(subreddit.clone(), 
                 search.into_str().unwrap()).unwrap();
             let last_path = format!("{}.{}", LAST_RESULT, subreddit);
-            handle_result(&settings, result, last_path);
+            handle_result(&mut settings, result, last_path);
         }
     }
 
     let output = reserialize(settings);
 
-    let mut file = File::create("Test.toml").unwrap();
+    let mut file = File::create("Settings.toml").unwrap();
 
     file.write_all(output.as_bytes()).unwrap();
 
 }
 
-fn handle_result(config: &Config, (link, title): SubResult, last_path:String){
+fn handle_result(config: &mut Config, (link, title): SubResult, last_path:String){
+    let mut devices = Vec::new();
+    for (_, id) in config.get_table(DEVICES).unwrap(){
+        devices.push(id.into_str().unwrap());
+    }
+    let token = config.get_str(CONF_TOKEN).unwrap();
     match config.get::<String>(&last_path){
         Ok(last_res) => {
-            if last_res != last_path{
-                
+            if last_res != link{
+                config.set(&last_path, link.clone()).unwrap();
+                send_push_link(devices, &token, (link, title))
             }
         }
-        Err(_) => ()
+        Err(_) => {
+            config.set(&last_path, link.clone()).unwrap();
+            send_push_link(devices, &token, (link, title))
+        }
     };
 }
 
@@ -79,6 +89,15 @@ fn get_user_settings(config: &mut Config){
         }, 
         Err(_) => get_subreddits(config)
     };
+
+    match config.get_table(DEVICES){
+        Ok(map) => {
+            if map.is_empty(){
+                conf_devices(config);
+            }
+        },
+        Err(_) => conf_devices(config)
+    }
 }
 
 fn get_user_setting(config: &mut Config, msg: &str, setting: &str){
@@ -97,13 +116,21 @@ fn conf_devices(config: &mut Config){
         devices_vec.push(device);
     }
     println!("Devices available to be pushed to: ");
-    for (ind, (nick, id)) in devices_vec.into_iter().enumerate(){
+    for (ind, (nick, _)) in devices_vec.clone().into_iter().enumerate(){
         println!("{}: {}", ind, nick);
     }
-    print!("Enter devices to be pushed to (e.g. 1, 2)");
+    print!("Enter devices to be pushed to (e.g. 1, 2): ");
     stdout().flush().unwrap();
     let mut device_inds = String::new();
     stdin().read_line(&mut device_inds).unwrap();
+    for index in device_inds.trim().replace(" ", "").split(","){
+        let index = index.parse::<usize>().unwrap();
+        let device = &devices_vec.get(index).unwrap();
+        let mut toml_friendly_nick = &device.0;
+        let key_2 = toml_friendly_nick.replace(" ", "_");
+        let key = format!("{}.{}", DEVICES, key_2);
+        config.set(&key[..], &device.1[..]).unwrap();
+    }
 }
 
 fn get_subreddits(config: &mut Config){
