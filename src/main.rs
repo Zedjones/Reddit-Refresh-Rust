@@ -29,9 +29,10 @@ fn main() {
 
     for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
         for search in searches.into_array().unwrap(){
+            let search = search.into_str().unwrap();
             let result = get_results(subreddit.clone(), 
-                search.into_str().unwrap()).unwrap();
-            let last_path = format!("{}.{}", LAST_RESULT, subreddit);
+                search.clone()).unwrap();
+            let last_path = format!("{}.{}_{}", LAST_RESULT, subreddit, search);
             handle_result(&mut settings, result, last_path);
         }
     }
