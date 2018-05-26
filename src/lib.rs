@@ -17,7 +17,7 @@ pub mod reserializer{
      * @preconditions - config must not contain high level mappings, i.e.
      * those outside of a category 
     */
-    pub fn reserialize(config: Config) -> String{
+    pub fn reserialize(config: &Config) -> String{
 
         let mut output = String::new();
 

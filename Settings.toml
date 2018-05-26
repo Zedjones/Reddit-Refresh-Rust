@@ -1,16 +1,19 @@
-[subreddits]
-mechanicalkeyboards = ["Planck"]
-
 [program_config]
-interval = "2"
+interval = ".2"
+
+[last_result]
+programming_rust = "https://www.reddit.com/r/programming/comments/8lms0w/resvg_03_an_svg_rendering_library_rrust/"
+mechmarket_planck = "https://www.reddit.com/r/mechmarket/comments/8m6hit/usmih_b87_modm_planck_cherry_browns_dsa_quartz/"
+gamedeals_battlefield = "https://www.reddit.com/r/GameDeals/comments/8lagoh/origin_battlefield_1_in_the_name_of_the_tsar_dlc/"
+
+[subreddits]
+programming = ["Rust"]
+mechmarket = ["Planck"]
+gamedeals = ["Battlefield"]
 
 [devices]
 huawei_nexus_6p = "ujAoL3MXhg4sjz3yaXuUnY"
 
-[last_result]
-mechanicalkeyboards = "https://www.reddit.com/r/MechanicalKeyboards/comments/8lbu39/help_planck_shift_getting_stuck/"
-
 [user_info]
-token = "o.qad2VOhc2iY8U6zB7ZeUJLo5tcgkqHu0"
-api_key = "your_api_key"
+token = "o.KxfuUTq4hC6a26wlxFyCjSEpSKiVLzbr"
 

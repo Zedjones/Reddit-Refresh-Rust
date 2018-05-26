@@ -11,6 +11,7 @@ use std::path::Path;
 use std::io::prelude::Write;
 use std::io::stdin;
 use std::io::stdout;
+use std::{thread, time};
 
 const CONF_TOKEN: &str = "user_info.token";
 const CONF_INTERVAL: &str = "program_config.interval";
@@ -27,21 +28,35 @@ fn main() {
 
     get_user_settings(&mut settings);
 
-    for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
-        for search in searches.into_array().unwrap(){
-            let search = search.into_str().unwrap();
-            let result = get_results(subreddit.clone(), 
-                search.clone()).unwrap();
-            let last_path = format!("{}.{}_{}", LAST_RESULT, subreddit, search);
-            handle_result(&mut settings, result, last_path);
+    let interval = settings.get_str(CONF_INTERVAL).unwrap();
+
+    let interval: f64 = interval.parse().expect("Interval not a number");
+
+    let interval = (interval * 60.0) as u64;
+
+    let wait_time = time::Duration::from_secs(interval);
+
+    loop{
+
+        println!("Checking results (Ctrl-C to stop)");
+
+        for (subreddit, searches) in settings.get_table(SUBS).unwrap(){
+            for search in searches.into_array().unwrap(){
+                let search = search.into_str().unwrap();
+                let result = get_results(subreddit.clone(), 
+                    search.clone()).unwrap();
+                let last_path = format!("{}.{}_{}", LAST_RESULT, subreddit, search);
+                handle_result(&mut settings, result, last_path);
+            }
         }
+
+        let output = reserialize(&settings);
+        let mut file = File::create("Settings.toml").unwrap();
+        file.write_all(output.as_bytes()).unwrap();
+
+        thread::sleep(wait_time);
+
     }
-
-    let output = reserialize(settings);
-
-    let mut file = File::create("Settings.toml").unwrap();
-
-    file.write_all(output.as_bytes()).unwrap();
 
 }
 
