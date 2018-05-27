@@ -47,7 +47,7 @@ fn main() {
                 let result = get_results(subreddit.clone(), 
                     search.clone()).unwrap();
                 //keep track of last result 
-                let last_path = format!("{}.{}_{}", LAST_RESULT, subreddit, search);
+                let last_path = format!("{}.{}_{}", LAST_RESULT, subreddit, search.replace(" ", "_"));
                 handle_result(&mut settings, result, last_path);
             }
         }
